@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Refaay's Space</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <div class="grain"></div>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <a class="brand" href="#" aria-label="Refaay's Space home">
+          <span class="brand-mark">R</span>
+          <span>Refaay's <i>Space</i></span>
+        </a>
+
+        <nav>
+          <p class="nav-label">Your space</p>
+          <button class="nav-item active" data-page="home">
+            <span class="nav-icon">⌂</span><span>Home</span>
+          </button>
+          <p class="nav-label tools-label">Mini apps</p>
+          <button class="nav-item" data-page="music-remover">
+            <span class="nav-icon waveform-icon">≋</span><span>Music Remover</span>
+          </button>
+        </nav>
+
+        <div class="sidebar-bottom">
+          <div class="local-badge"><span></span> Everything stays local</div>
+          <button class="nav-item" data-page="settings"><span class="nav-icon">⚙</span><span>Setup</span></button>
+          <div class="profile">
+            <div class="avatar">MR</div>
+            <div><strong>Mohamed Refaay</strong><small>Personal workspace</small></div>
+          </div>
+        </div>
+      </aside>
+
+      <main>
+        <header class="topbar">
+          <div class="breadcrumb"><span>Refaay's Space</span><b>/</b><strong id="page-name">Home</strong></div>
+          <div class="date-pill" id="today"></div>
+        </header>
+
+        <section class="page active" id="home-page">
+          <div class="hero">
+            <p class="eyebrow">WELCOME HOME</p>
+            <h1>Your tools.<br><em>Your space.</em></h1>
+            <p>A quiet corner for the little things you do often — thoughtfully made, always close.</p>
+          </div>
+          <div class="section-heading">
+            <div><p class="eyebrow">MINI APPS</p><h2>Ready when you are</h2></div>
+            <span>1 app</span>
+          </div>
+          <button class="app-card" data-open-app="music-remover">
+            <div class="app-visual">
+              <div class="record"><div></div></div>
+              <div class="sound-lines"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+            </div>
+            <div class="app-info">
+              <span class="category">AUDIO & VIDEO</span>
+              <h3>Music Remover</h3>
+              <p>Keep the voices. Leave the music behind.</p>
+              <span class="launch">Open app <b>→</b></span>
+            </div>
+          </button>
+          <div class="coming-soon"><span>＋</span><p><strong>More space to grow</strong>New mini apps will live here.</p></div>
+        </section>
+
+        <section class="page" id="music-remover-page">
+          <button class="back-link" data-page="home">← All mini apps</button>
+          <div class="tool-title">
+            <div class="tool-icon">≋</div>
+            <div><p class="eyebrow">AUDIO & VIDEO</p><h1>Music Remover</h1><p>Separate background music from speech, entirely on your device.</p></div>
+          </div>
+
+          <div class="workspace-card">
+            <div id="drop-zone" class="drop-zone">
+              <input id="video-input" type="hidden">
+              <div class="upload-icon"><span>↑</span></div>
+              <h2>Drop a video here</h2>
+              <p>or choose one from your computer</p>
+              <button id="browse-button" class="primary-button">Choose video</button>
+              <small>MP4, MOV, MKV, AVI, WebM · any length</small>
+            </div>
+
+            <div id="file-panel" class="file-panel hidden">
+              <div class="file-summary">
+                <div class="video-thumb"><span>▶</span></div>
+                <div class="file-copy"><h3 id="file-name"></h3><p id="file-meta"></p><span id="file-path"></span></div>
+                <button id="remove-file" class="icon-button" aria-label="Remove video">×</button>
+              </div>
+
+              <div class="output-row">
+                <div><label>Save finished video to</label><p id="output-path">Same folder as the original</p></div>
+                <button id="choose-output" class="secondary-button">Change</button>
+              </div>
+
+              <div class="privacy-note"><span>◇</span><p><strong>Private by design</strong>Your video never leaves this computer. Long videos are processed in small parts to keep memory use steady.</p></div>
+              <button id="start-button" class="primary-button wide"><span>Remove music</span><b>→</b></button>
+            </div>
+
+            <div id="progress-panel" class="progress-panel hidden">
+              <div class="processing-orbit"><div>≋</div><i></i></div>
+              <p class="eyebrow">WORKING LOCALLY</p>
+              <h2 id="progress-title">Preparing your video</h2>
+              <p id="progress-detail">This may take a while for longer videos.</p>
+              <div class="progress-track"><div id="progress-bar"></div></div>
+              <div class="progress-stats"><span id="progress-stage">Preparing</span><strong id="progress-percent">0%</strong></div>
+              <button id="cancel-button" class="text-button">Cancel processing</button>
+            </div>
+
+            <div id="result-panel" class="result-panel hidden">
+              <div class="success-mark">✓</div>
+              <p class="eyebrow">ALL DONE</p>
+              <h2>Your music-free video is ready.</h2>
+              <p id="result-path"></p>
+              <div class="result-actions"><button id="reveal-button" class="primary-button">Show in folder</button><button id="another-button" class="secondary-button">Process another</button></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="page" id="settings-page">
+          <p class="eyebrow">SETUP</p>
+          <h1 class="settings-title">Ready to work?</h1>
+          <p class="settings-intro">Music Remover uses a local AI model. The first run downloads the model once, then it works offline.</p>
+          <div class="setup-card">
+            <div class="check-row"><span>Video engine</span><strong id="ffmpeg-status">Checking…</strong></div>
+            <div class="check-row"><span>AI separation engine</span><strong id="demucs-status">Checking…</strong></div>
+            <div id="install-help" class="install-help hidden">
+              <p>Install the missing AI engine in Terminal:</p>
+              <code>python3 -m pip install -U demucs</code>
+              <small>Demucs requires Python 3.9–3.12. If your default Python is newer, install Python 3.12 first.</small>
+            </div>
+            <button id="recheck-button" class="secondary-button">Check again</button>
+          </div>
+        </section>
+      </main>
+    </div>
+    <script src="renderer.js"></script>
+  </body>
+</html>
