@@ -1,8 +1,11 @@
 (() => {
   const STORAGE_KEY = 'refaay.intervalTimer';
+  const SETS_KEY = 'refaay.intervalTimer.sets';
   const COLORS = ['#b85f3d', '#d9a441', '#3f7a5c', '#5f86a3', '#8b6aa8'];
   const DIAL_LENGTH = 2 * Math.PI * 90;
   const DEFAULTS = {
+    setId: null,
+    name: '',
     rounds: 8,
     infinite: false,
     lead: 5,
@@ -15,6 +18,7 @@
   };
 
   let config = loadConfig();
+  let sets = loadSets();
   let run = null;
   let ticker = null;
   let audio = null;
@@ -31,6 +35,18 @@
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(config)); } catch {}
   }
 
+  function loadSets() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(SETS_KEY));
+      if (Array.isArray(saved)) return saved;
+    } catch {}
+    return [];
+  }
+
+  function saveSets() {
+    try { localStorage.setItem(SETS_KEY, JSON.stringify(sets)); } catch {}
+  }
+
   function formatClock(totalSeconds) {
     const hours = Math.floor(totalSeconds / 3600);
     const minutes = Math.floor((totalSeconds % 3600) / 60);
@@ -40,7 +56,138 @@
   }
 
   const sliceName = (index) => config.slices[index].name.trim() || `Slice ${index + 1}`;
-  const roundSeconds = () => config.slices.reduce((sum, slice) => sum + slice.seconds, 0);
+  const roundSeconds = (source = config) => source.slices.reduce((sum, slice) => sum + slice.seconds, 0);
+  const setName = (source = config) => source.name.trim() || 'Untitled set';
+
+  // The parts of the editor that make up a saved set (sound is a global preference).
+  function setFields(source) {
+    return {
+      name: source.name.trim(),
+      rounds: source.rounds,
+      infinite: source.infinite,
+      lead: source.lead,
+      slices: source.slices.map(({ name, seconds, color }) => ({ name, seconds, color }))
+    };
+  }
+
+  const activeSet = () => sets.find((set) => set.id === config.setId);
+  const isDirty = () => !activeSet() || JSON.stringify(setFields(activeSet())) !== JSON.stringify(setFields(config));
+
+  function describeSet(set) {
+    const perRound = roundSeconds(set);
+    const count = `${set.slices.length} ${set.slices.length === 1 ? 'slice' : 'slices'}`;
+    return set.infinite
+      ? `${count} · ${formatClock(perRound)} × ∞`
+      : `${count} · ${formatClock(perRound)} × ${set.rounds} = ${formatClock(perRound * set.rounds)}`;
+  }
+
+  // ── Saved sets ───────────────────────────────────────────────────────
+
+  function renderSets() {
+    const list = $('#set-list');
+    list.innerHTML = '';
+    $('#sets-count').textContent = sets.length
+      ? `${sets.length} ${sets.length === 1 ? 'set' : 'sets'} · press ▶ to start one right away`
+      : 'Build a set below and save it to play it again anytime.';
+    if (!sets.length) {
+      list.innerHTML = '<div class="sets-empty">No saved sets yet.</div>';
+      return;
+    }
+    sets.forEach((set) => {
+      const card = document.createElement('div');
+      card.className = 'set-card';
+      card.dataset.id = set.id;
+      card.classList.toggle('active', set.id === config.setId);
+      card.innerHTML = `
+        <button class="play-button" data-action="play" aria-label="Play set">▶</button>
+        <div class="set-copy"><h3></h3><p></p><div class="set-bar"></div></div>
+        <div class="set-actions">
+          <button class="icon-button" data-action="duplicate" title="Duplicate" aria-label="Duplicate set">⧉</button>
+          <button class="icon-button" data-action="delete" title="Delete" aria-label="Delete set">×</button>
+        </div>`;
+      card.querySelector('h3').textContent = setName(set);
+      card.querySelector('p').textContent = describeSet(set);
+      set.slices.forEach((slice) => {
+        const segment = document.createElement('i');
+        segment.style.flexGrow = slice.seconds;
+        segment.style.background = slice.color;
+        card.querySelector('.set-bar').append(segment);
+      });
+      list.append(card);
+    });
+  }
+
+  function renderSaveButton() {
+    const button = $('#save-set');
+    const saved = activeSet() && !isDirty();
+    button.textContent = saved ? 'Saved ✓' : activeSet() ? 'Save changes' : 'Save set';
+    button.disabled = saved;
+  }
+
+  function loadSet(set) {
+    config = { ...structuredClone(DEFAULTS), ...structuredClone(set), setId: set.id, sound: config.sound };
+    delete config.id;
+    saveConfig();
+    renderSetup();
+  }
+
+  function saveSet() {
+    const fields = setFields(config);
+    if (!fields.name) {
+      fields.name = `Set ${sets.length + 1}`;
+      config.name = fields.name;
+    }
+    const existing = activeSet();
+    if (existing) Object.assign(existing, fields);
+    else {
+      const set = { id: `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`, ...fields };
+      sets.push(set);
+      config.setId = set.id;
+    }
+    saveSets();
+    saveConfig();
+    renderSetup();
+  }
+
+  $('#set-list').addEventListener('click', (event) => {
+    const card = event.target.closest('.set-card');
+    if (!card) return;
+    const index = sets.findIndex((set) => set.id === card.dataset.id);
+    const set = sets[index];
+    const action = event.target.closest('[data-action]')?.dataset.action || 'edit';
+    if (action === 'play') {
+      loadSet(set);
+      start();
+    } else if (action === 'edit') {
+      loadSet(set);
+    } else if (action === 'duplicate') {
+      const copy = { ...structuredClone(set), id: `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`, name: `${setName(set)} copy` };
+      sets.splice(index + 1, 0, copy);
+      saveSets();
+      loadSet(copy);
+    } else if (action === 'delete' && confirm(`Delete "${setName(set)}"?`)) {
+      sets.splice(index, 1);
+      if (config.setId === set.id) config.setId = null;
+      saveSets();
+      saveConfig();
+      renderSetup();
+    }
+  });
+
+  $('#new-set').addEventListener('click', () => {
+    config = { ...structuredClone(DEFAULTS), sound: config.sound };
+    saveConfig();
+    renderSetup();
+    $('#set-name-input').focus();
+  });
+
+  $('#set-name-input').addEventListener('input', (event) => {
+    config.name = event.target.value;
+    saveConfig();
+    renderSaveButton();
+  });
+
+  $('#save-set').addEventListener('click', saveSet);
 
   // ── Setup ────────────────────────────────────────────────────────────
 
@@ -77,13 +224,16 @@
     $('#infinite-input').checked = config.infinite;
     $('#lead-input').value = config.lead;
     $('#sound-input').checked = config.sound;
+    $('#set-name-input').value = config.name;
     renderSummary();
+    renderSets();
   }
 
   function renderSummary() {
     const perRound = roundSeconds();
     $('#round-length').textContent = `${config.slices.length} ${config.slices.length === 1 ? 'slice' : 'slices'} · ${formatClock(perRound)} per round`;
     $('#total-length').textContent = config.infinite ? 'Repeats until you stop' : `${formatClock(perRound * config.rounds)} total`;
+    renderSaveButton();
   }
 
   function readSliceTime(row) {
@@ -205,6 +355,7 @@
     if (run.phase === 'lead') renderTimeline();
     clearInterval(ticker);
     ticker = setInterval(tick, 50);
+    $('#interval-timer-page').classList.add('running');
     $('#timer-setup').classList.add('hidden');
     $('#timer-run').classList.remove('hidden');
     $('#timer-run').classList.remove('done');
@@ -255,6 +406,7 @@
   function stop() {
     clearInterval(ticker);
     run = null;
+    $('#interval-timer-page').classList.remove('running');
     $('#timer-run').classList.add('hidden');
     $('#timer-run').classList.remove('paused', 'done');
     $('#timer-setup').classList.remove('hidden');
@@ -272,7 +424,7 @@
     $('#run-label').textContent = 'Workout complete';
     $('#run-time').textContent = '✓';
     $('#run-next').textContent = `${config.rounds} ${config.rounds === 1 ? 'round' : 'rounds'} · ${formatClock(roundSeconds() * config.rounds)}`;
-    $('#run-round').textContent = 'Nice work';
+    $('#run-round').textContent = `${setName()} · Nice work`;
     $('#dial-progress').style.strokeDashoffset = 0;
     $('#dial-progress').style.stroke = 'var(--green)';
     $('#timer-run').style.setProperty('--slice-color', 'var(--green)');
@@ -305,7 +457,7 @@
     $('#timer-run').style.setProperty('--slice-color', color);
     $('#run-label').textContent = isLead ? 'Get ready' : sliceName(run.sliceIndex);
     $('#run-time').textContent = formatClock(Math.ceil(remaining / 1000));
-    $('#run-round').textContent = config.infinite ? `Round ${run.round}` : `Round ${run.round} of ${config.rounds}`;
+    $('#run-round').textContent = `${setName()} · ${config.infinite ? `Round ${run.round}` : `Round ${run.round} of ${config.rounds}`}`;
     $('#dial-progress').style.stroke = color;
     $('#dial-progress').style.strokeDashoffset = DIAL_LENGTH * elapsedRatio;
 

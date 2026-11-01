@@ -142,10 +142,21 @@
             <div><p class="eyebrow">FITNESS</p><h1>Interval Timer</h1><p>Build a round from timed slices, then repeat it as many times as you like.</p></div>
           </div>
 
+          <div class="sets-section">
+            <div class="sets-head">
+              <div><h2>Saved sets</h2><p id="sets-count"></p></div>
+              <button id="new-set" class="secondary-button">＋ New set</button>
+            </div>
+            <div id="set-list" class="set-list"></div>
+          </div>
+
           <div class="workspace-card">
             <div id="timer-setup" class="timer-setup">
               <div class="timer-section-head">
-                <div><h2>Slices</h2><p>Each round plays these in order. Tap a colour dot to change it.</p></div>
+                <div class="set-name-field">
+                  <input id="set-name-input" placeholder="Untitled set" maxlength="40" aria-label="Set name">
+                  <p>Each round plays these slices in order. Tap a colour dot to change it.</p>
+                </div>
                 <button id="add-slice" class="secondary-button">＋ Add slice</button>
               </div>
               <div id="slice-list" class="slice-list"></div>
@@ -169,7 +180,10 @@
               </div>
 
               <div class="timer-summary"><span id="round-length"></span><strong id="total-length"></strong></div>
-              <button id="timer-start" class="primary-button wide"><span>Start workout</span><b>→</b></button>
+              <div class="timer-actions">
+                <button id="save-set" class="secondary-button">Save set</button>
+                <button id="timer-start" class="primary-button"><span>Start workout</span><b>→</b></button>
+              </div>
             </div>
 
             <div id="timer-run" class="timer-run hidden">
