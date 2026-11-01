@@ -24,6 +24,9 @@
           <button class="nav-item" data-page="music-remover">
             <span class="nav-icon waveform-icon">≋</span><span>Music Remover</span>
           </button>
+          <button class="nav-item" data-page="interval-timer">
+            <span class="nav-icon timer-icon">◷</span><span>Interval Timer</span>
+          </button>
         </nav>
 
         <div class="sidebar-bottom">
@@ -50,7 +53,7 @@
           </div>
           <div class="section-heading">
             <div><p class="eyebrow">MINI APPS</p><h2>Ready when you are</h2></div>
-            <span>1 app</span>
+            <span>2 apps</span>
           </div>
           <button class="app-card" data-open-app="music-remover">
             <div class="app-visual">
@@ -61,6 +64,18 @@
               <span class="category">AUDIO & VIDEO</span>
               <h3>Music Remover</h3>
               <p>Keep the voices. Leave the music behind.</p>
+              <span class="launch">Open app <b>→</b></span>
+            </div>
+          </button>
+          <button class="app-card" data-open-app="interval-timer">
+            <div class="app-visual timer-visual">
+              <div class="mini-dial"><span>0:20</span></div>
+              <div class="mini-slices"><i></i><i></i><i></i></div>
+            </div>
+            <div class="app-info">
+              <span class="category">FITNESS</span>
+              <h3>Interval Timer</h3>
+              <p>Work, push, rest — repeat on your terms.</p>
               <span class="launch">Open app <b>→</b></span>
             </div>
           </button>
@@ -120,6 +135,60 @@
           </div>
         </section>
 
+        <section class="page" id="interval-timer-page">
+          <button class="back-link" data-page="home">← All mini apps</button>
+          <div class="tool-title">
+            <div class="tool-icon">◷</div>
+            <div><p class="eyebrow">FITNESS</p><h1>Interval Timer</h1><p>Build a round from timed slices, then repeat it as many times as you like.</p></div>
+          </div>
+
+          <div class="workspace-card">
+            <div id="timer-setup" class="timer-setup">
+              <div class="timer-section-head">
+                <div><h2>Slices</h2><p>Each round plays these in order. Tap a colour dot to change it.</p></div>
+                <button id="add-slice" class="secondary-button">＋ Add slice</button>
+              </div>
+              <div id="slice-list" class="slice-list"></div>
+
+              <div class="timer-options">
+                <div class="timer-option">
+                  <label for="rounds-input">Rounds</label>
+                  <div class="option-controls">
+                    <input id="rounds-input" class="option-number" type="number" min="1" max="999">
+                    <label class="toggle"><input id="infinite-input" type="checkbox"><span>∞ Infinite</span></label>
+                  </div>
+                </div>
+                <div class="timer-option">
+                  <label for="lead-input">Get-ready countdown</label>
+                  <div class="option-controls"><input id="lead-input" class="option-number" type="number" min="0" max="60"><span>sec</span></div>
+                </div>
+                <div class="timer-option">
+                  <label>Sound cues</label>
+                  <div class="option-controls"><label class="toggle"><input id="sound-input" type="checkbox"><span>Beeps</span></label></div>
+                </div>
+              </div>
+
+              <div class="timer-summary"><span id="round-length"></span><strong id="total-length"></strong></div>
+              <button id="timer-start" class="primary-button wide"><span>Start workout</span><b>→</b></button>
+            </div>
+
+            <div id="timer-run" class="timer-run hidden">
+              <p id="run-round" class="eyebrow"></p>
+              <div class="run-dial">
+                <svg viewBox="0 0 200 200" aria-hidden="true"><circle class="dial-track" cx="100" cy="100" r="90"/><circle id="dial-progress" class="dial-progress" cx="100" cy="100" r="90"/></svg>
+                <div class="dial-copy"><p id="run-label"></p><strong id="run-time"></strong><span id="run-next"></span></div>
+              </div>
+              <div id="run-timeline" class="run-timeline"></div>
+              <div class="run-controls">
+                <button id="timer-stop" class="secondary-button">Stop</button>
+                <button id="timer-pause" class="primary-button">Pause</button>
+                <button id="timer-skip" class="secondary-button">Skip →</button>
+              </div>
+              <small class="run-hint">Space to pause or resume</small>
+            </div>
+          </div>
+        </section>
+
         <section class="page" id="settings-page">
           <p class="eyebrow">SETUP</p>
           <h1 class="settings-title">Ready to work?</h1>
@@ -138,5 +207,6 @@
       </main>
     </div>
     <script src="renderer.js"></script>
+    <script src="interval-timer.js"></script>
   </body>
 </html>

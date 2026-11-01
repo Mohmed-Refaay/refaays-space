@@ -9,7 +9,7 @@
   "scripts": {
     "start": "electron .",
     "dev": "electron .",
-    "check": "node --check src/main.js && node --check src/preload.js && node --check src/renderer.js && node --check src/music-remover.js",
+    "check": "node --check src/main.js && node --check src/preload.js && node --check src/renderer.js && node --check src/music-remover.js && node --check src/interval-timer.js",
     "dist:mac": "electron-builder --mac"
   },
   "dependencies": {

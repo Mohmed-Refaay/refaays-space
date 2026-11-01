@@ -16,7 +16,9 @@ function createWindow() {
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
-      nodeIntegration: false
+      nodeIntegration: false,
+      // Keeps the interval timer ticking (and beeping) while the window is in the background.
+      backgroundThrottling: false
     }
   });
 

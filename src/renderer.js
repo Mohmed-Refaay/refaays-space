@@ -1,5 +1,7 @@
 const state = { inputPath: null, outputDirectory: null, info: null, outputPath: null };
 
+const pageTitles = { 'music-remover': 'Music Remover', 'interval-timer': 'Interval Timer' };
+
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => [...document.querySelectorAll(selector)];
 
@@ -7,7 +9,7 @@ function showPage(name) {
   $$('.page').forEach((page) => page.classList.remove('active'));
   $$('.nav-item[data-page]').forEach((item) => item.classList.toggle('active', item.dataset.page === name));
   $(`#${name}-page`).classList.add('active');
-  $('#page-name').textContent = name === 'music-remover' ? 'Music Remover' : name[0].toUpperCase() + name.slice(1);
+  $('#page-name').textContent = pageTitles[name] || name[0].toUpperCase() + name.slice(1);
   if (name === 'settings') refreshSystemStatus();
 }
 
