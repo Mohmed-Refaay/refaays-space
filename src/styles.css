@@ -122,3 +122,7 @@ main { overflow:auto; height:100vh; }.topbar { position:sticky; top:0; z-index:4
 .timer-actions .secondary-button{min-width:130px}
 .timer-actions .secondary-button:disabled{color:var(--green);cursor:default;background:transparent}
 .timer-actions .primary-button{flex:1;display:flex;align-items:center;justify-content:space-between;padding:14px 18px}
+
+/* Window dragging: the title bar is hidden, so the sidebar and top bar act as drag handles. */
+.sidebar, .topbar { -webkit-app-region:drag; user-select:none; }
+.sidebar a, .sidebar button, .topbar a, .topbar button { -webkit-app-region:no-drag; }
